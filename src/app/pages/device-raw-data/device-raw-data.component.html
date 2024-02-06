@@ -1,0 +1,177 @@
+<div class="wrapper">
+
+  <!-- Add this just below the <body> tag -->
+  <ngx-ui-loader loaderId="loader" loaderType="ball-scale-multiple" color="#007bff"></ngx-ui-loader>
+  <ngx-ui-loader></ngx-ui-loader>
+  <!-- Preloader -->
+  <!-- <div class="preloader flex-column justify-content-center align-items-center">
+      <img class="animation__wobble" src="assets/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+    </div> -->
+
+  <!-- Navbar -->
+  <app-header></app-header>
+  <!-- /.navbar -->
+
+  <!-- Main Sidebar Container -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a [routerLink]="['/deviceRawData']" class="brand-link">
+      <img src="assets/img/tracwater-header.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+        style="opacity: 1.8;margin-top: 19px;width: 77%;">
+      <!-- <span class="brand-text font-weight-light">Admin</span> -->
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user panel (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <!-- <img src="assets/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image"> -->
+        </div>
+        <div class="info">
+          <a href="#" class="d-block"></a>
+        </div>
+      </div>
+
+      <!-- SidebarSearch Form -->
+
+
+      <app-sidebar></app-sidebar>
+    </div>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+
+    <section class="content">
+      <div class="container-fluid">
+
+        <form>
+          <div class="row">
+            <div class="col-md-10 offset-md-1">
+              <div class="row">
+                <div class="col-3">
+
+                </div>
+                <div class="col-9">
+                  <!-- <div class="form-group"> -->
+
+                  <!-- </div> -->
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+
+    <section class="content">
+      <div class="container-fluid">
+        <!-- <igx-paginator  [totalRecords]="numOfResult" [perPage]="limit" (pageChange)="onPageChange($event +1)" ></igx-paginator> -->
+
+        <div class="row">
+          <div class="col-12">
+
+            <!-- <label>
+            <input type="radio" name="autoRefresh" value="on" [(ngModel)]="autoRefresh" (change)="handleAutoRefreshChange()"> Auto Refresh
+          </label>
+          <label>
+            <input type="radio" name="autoRefresh" value="off" [(ngModel)]="autoRefresh" (change)="handleAutoRefreshChange()"> Manual Refresh
+          </label> -->
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="autoRefreshSwitch" [(ngModel)]="autoRefresh"
+                (ngModelChange)="handleAutoRefreshChange()">
+              <label class="form-check-label" for="autoRefreshSwitch">Auto Refresh</label>
+            </div>
+            <div class="card">
+
+              <div class="card-header">
+                <div class="date-pk-wrp">
+                  <label>Date Filter:</label>
+                  <input type="text" ngxDaterangepickerMd [(ngModel)]="selected" [showCustomRangeLabel]="true"
+                    [alwaysShowCalendars]="alwaysShowCalendars" [ranges]="dateRange" [locale]="{format: 'DD/MM/YYYY'}"
+                    [linkedCalendars]="true" [isInvalidDate]="isInvalidDate" [showClearButton]="true"
+                    (change)="calenderFilter()" placeholder="Select please..." />
+                </div>
+
+
+                <div class="select-bx-wrp">
+                  <label>Filter By Serial Id:</label>
+                  <select id="name-dropdown" (change)="onSelectionChange()" class="select2" [(ngModel)]="selectedValue"
+                    [ngModelOptions]="{ standalone: true }" placeholder="Any" style="width: 100%;">
+                    <option value="all" selected >All</option>
+                    <option *ngFor="let data of tableDataUnique" [value]="data.device_id">{{data.device_id}}</option>
+                  </select>
+                </div>
+
+                <div class="select-bx-wrp flex">
+                  <label>Search</label>
+                  <input type="text" id="searchInput" name="searchInput" placeholder="searching..." [(ngModel)]="searchValue"   (ngModelChange)="searchingCall()" (keydown)="searchingCall()">
+                </div>
+
+                <div> <button (click)="exportCsv()">Export CSV</button></div>
+
+              </div>
+
+
+              <!-- <ng-container *ngIf="totalPage <= threshold"> -->
+              <ngb-pagination [collectionSize]="numOfResult" [(page)]="currentPage" [pageSize]="limit" [maxSize]="10"
+                [boundaryLinks]="true" (pageChange)="filterTableDataByDate()">
+              </ngb-pagination>
+              <!-- </ng-container> -->
+              <div class="card-body">
+                <table id="example" class="table table-bordered table-striped headerSticky" datatable
+                  [dtOptions]="dtOptions">
+                  <!-- <table id="example" datatable [dtOptions]="dtOptions" class="row-border hover"> -->
+                  <thead>
+                    <tr>
+                      <!-- table row content -->
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- <tr *ngFor="let rowData of filteredDataDeviceData">
+                    <td [attr.data-order]="rowData.height.sort">{{ rowData.height.display }}</td>
+                  </tr> -->
+                  </tbody>
+
+                </table>
+                
+
+              </div>
+
+
+
+
+
+
+              <!-- /.card-body -->
+            </div>
+
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+  <!-- Main Footer -->
+  <footer class="main-footer">
+    <strong>Copyright &copy; 2022-2023 <a href="javascript:void(0)">OzGreen</a>.</strong>
+    All rights reserved.
+
+  </footer>
+
+</div>

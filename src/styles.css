@@ -1,0 +1,150 @@
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.mdc-button{
+    margin: 5px !important;
+}
+.mat-mdc-form-field{
+    width: 100%;
+}
+.content{
+    display: block !important;
+}
+a{
+    color: white !important;
+padding: 1%;
+}
+/* layout update 16-05-23 */
+.card-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+.card-header input {
+    margin-left: auto;
+    max-width: 250px;
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+}
+
+.card-header .select2-container {
+    max-width: 250px;
+    left: 0;
+    margin-left: 0;
+}
+.select-bx-wrp {
+    max-width: 250px;
+    width: 100%;
+}
+.select-bx-wrp {
+    margin-left: auto;
+}
+.dt-buttons{
+    display: inline-flex;
+    gap: 5px;
+    margin-bottom: 15px;
+}
+.dt-buttons button {
+    height: 40px;
+    min-width: 100px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #343a40;
+    color: #fff;
+}
+#example_filter label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+.dataTables_wrapper{
+    overflow: auto;
+}
+table#example th {
+    /* min-width: 120px; */
+    vertical-align: middle;
+}
+.sidebar{
+    width: 100%;
+    max-width: 100%;
+}
+.sidebar .input-group-append {
+    margin-left: 0;
+    position: absolute;
+    right: -2px;
+    top: -2px;
+    border-radius: 0;
+    z-index: 9;
+}
+#example_wrapper table.dataTable td.dataTables_empty{
+    text-align: left;
+}
+#example_wrapper .select2-container--default .select2-selection--single .select2-selection__rendered{
+    line-height: 25px;
+}
+.select2-container--default .select2-selection--single{
+    min-height: 35.6px;
+}
+.wrapper .content-wrapper {
+    height: unset;
+    min-height: 100px !important;
+}
+footer.main-footer {
+    position: absolute;
+    bottom: 14px;
+    left: 0;
+    height: 20px;
+    width: 100%;
+}
+.wrapper, body, html {
+    min-height: unset;
+    height: 100vh;
+    overflow: hidden;
+}
+#example_wrapper {
+    height: calc(100vh - 195px);
+    overflow-x: scroll;
+}
+table.headerSticky thead {
+    position: sticky;
+    width: 100%;
+    background: #fff;
+    left: 0;
+    top: 0;
+}
+
+
+/* pagination */
+ul.pagination {
+    position: fixed;
+    right: 20px;
+    bottom: 0;
+    z-index: 1;
+}
+ul.pagination li.page-item a.page-link, ul.pagination li.page-item a.page-link span {
+    color: #343a40 !important;
+    border: none!important;
+    box-shadow: none;
+}
+ul.pagination li.page-item.active a.page-link, ul.pagination li.page-item.active a.page-link span {
+    color: #fff !important;
+    background: #343a40 !important;
+}
+
+.custom-loader {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

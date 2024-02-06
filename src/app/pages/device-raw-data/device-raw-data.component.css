@@ -1,0 +1,25 @@
+.card-header.pageDiv {
+    width: 190px;
+    position: absolute;
+    right: 0;
+    bottom: 20px;
+    z-index: 1;
+    background: none;
+    padding: 0;
+    border-bottom: 0;
+}
+.card-header.pageDiv button {
+    border: 1px solid transparent;
+    border-radius: 5px;
+}
+.main-footer a {
+    color: #646464 !important;
+}
+.card-header.numOfResult {
+    background: white;
+    z-index: 1;
+    top: -14px;
+    left: -14px;
+}
+
+
