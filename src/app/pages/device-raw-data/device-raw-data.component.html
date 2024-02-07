@@ -114,8 +114,12 @@
                     [(ngModel)]="searchValue" (ngModelChange)="searchingCall()" (keydown)="searchingCall()">
                 </div>
 
-                <div> <button (click)="exportCsv('CSV')">Export CSV</button> <button (click)="exportCsv('Excel')">Export
-                    Excel</button></div>
+                <div>
+                  <button (click)="exportCsv('Copy')">Copy</button>
+                  <button (click)="exportCsv('CSV')">Export CSV</button>
+                  <button (click)="exportCsv('Excel')">Export Excel</button>
+                  <button (click)="exportCsv('Print')">Print</button>
+                </div>
 
               </div>
 

@@ -155,9 +155,9 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
       // dom: 'Bfrt',
       searching: false,
       dom: 'Bfrt',
-      buttons: [
-        'copy', 'csv', 'excel', 'print'
-      ],
+      // buttons: [
+      //   'copy', 'csv', 'excel', 'print'
+      // ],
       columns: [
         { title: 'Device ID', data: 'device_id' },
         //{ title: 'TracNet Id', data: '_id' },
@@ -492,30 +492,139 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
   // }
 
   exportCsv(fileType: any) {
-    this._api.getExport('raw-data/export-csv',
-      this.currentPage,
-      this.limit,
-      this.startDateFil,
-      this.endDateFil,
-      this.deviceIdData,
-      this.searchValue,
-    ).subscribe(
-      (response: any) => {
-        if (fileType === 'CSV') {
-          const csvString = this.convertArrayOfObjectsToCSV(response);
-          this.downloadFile(csvString, 'filename.csv', 'text/csv');
-        }
-        if (fileType === 'Excel') {
-          const excelData = this.convertArrayOfObjectsToExcel(response);
-          this.downloadFile(excelData, 'filename.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        }
+    this._api.getExport('raw-data/export-csv', this.currentPage, this.limit, this.startDateFil, this.endDateFil, this.deviceIdData, this.searchValue,).subscribe((response: any) => {
 
-      },
+      response.forEach((item: any) => {
+        if (item.data_type == "2") {
+          item.data_type = "Scheduled";
+        }
+        if (item.data_type != "2") {
+          item.data_type = "Alarm";
+        }
+      });
+
+      if (fileType === 'CSV') {
+        const csvString = this.convertArrayOfObjectsToCSV(response);
+        this.downloadFile(csvString, 'filename.csv', 'text/csv');
+      }
+      if (fileType === 'Excel') {
+        const excelData = this.convertArrayOfObjectsToExcel(response);
+        this.downloadFile(excelData, 'filename.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      }
+      if (fileType === 'Print') {
+        this.printData(response);
+      }
+      if (fileType === 'Copy') {
+        this.copyData(response);
+      }
+
+    },
       (error) => {
         console.error('Error exporting CSV:', error);
       }
     );
   }
+  copyData(data: any[]) {
+    const copyContent = this.formatDataForPrint(data);
+    const textarea = document.createElement('textarea');
+    textarea.value = copyContent;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+
+  }
+  printData(data: any[]) {
+    // You can customize this function based on how you want to format and print your data
+    const printContent = this.formatDataForPrint(data);
+
+    // Open a new window and write the content to be printed
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+
+      // Trigger the print operation
+      printWindow.print();
+    } else {
+      console.error('Error opening print window.');
+    }
+  }
+  formatDataForPrint(data: any[]): string {
+    const tableRows = data.map(item => {
+      return `
+        <tr>
+          <td>${item.serverip}</td>
+          <td>${item.remoteip}</td>
+          <td>${item.date}</td>
+          <td>${item.device_id}</td>
+          <td>${item.height}</td>
+          <td>${item.temperature}</td>
+          <td>${item.angle}</td>
+          <td>${item.status}</td>
+          <td>${item.moved_alarm}</td>
+          <td>${item.battery_status}</td>
+          <td>${item.battery_voltage}</td>
+          <td>${item.signal_strength}</td>
+          <td>${item.uploads_since_power_on}</td>
+          <td>${item.data_type}</td>
+        </tr>
+      `;
+    });
+
+    return `
+      <html>
+        <head>
+          <title>Point History</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+            th, td {
+              border: 1px solid #dddddd;
+              text-align: left;
+              padding: 8px;
+            }
+            th {
+              background-color: #f2f2f2;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Point History</h1>
+          <table>
+            <thead>
+              <tr>
+                <th>Server IP</th>
+                <th>Remote IP</th>
+                <th>Date</th>
+                <th>Device ID</th>
+                <th>Height</th>
+                <th>Temperature</th>
+                <th>Angle</th>
+                <th>Status</th>
+                <th>Moved Alarm</th>
+                <th>Battery Status</th>
+                <th>Battery Voltage</th>
+                <th>Signal Strength</th>
+                <th>Uploads Since Power On</th>
+                <th>Data Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows.join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+  }
+
 
 
   convertArrayOfObjectsToCSV(data: any[]): string {
