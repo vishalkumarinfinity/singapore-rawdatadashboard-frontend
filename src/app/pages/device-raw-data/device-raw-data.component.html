@@ -103,17 +103,19 @@
                   <label>Filter By Serial Id:</label>
                   <select id="name-dropdown" (change)="onSelectionChange()" class="select2" [(ngModel)]="selectedValue"
                     [ngModelOptions]="{ standalone: true }" placeholder="Any" style="width: 100%;">
-                    <option value="all" selected >All</option>
+                    <option value="all" selected>All</option>
                     <option *ngFor="let data of tableDataUnique" [value]="data.device_id">{{data.device_id}}</option>
                   </select>
                 </div>
 
                 <div class="select-bx-wrp flex">
                   <label>Search</label>
-                  <input type="text" id="searchInput" name="searchInput" placeholder="searching..." [(ngModel)]="searchValue"   (ngModelChange)="searchingCall()" (keydown)="searchingCall()">
+                  <input type="text" id="searchInput" name="searchInput" placeholder="searching..."
+                    [(ngModel)]="searchValue" (ngModelChange)="searchingCall()" (keydown)="searchingCall()">
                 </div>
 
-                <div> <button (click)="exportCsv()">Export CSV</button></div>
+                <div> <button (click)="exportCsv('CSV')">Export CSV</button> <button (click)="exportCsv('Excel')">Export
+                    Excel</button></div>
 
               </div>
 
@@ -139,7 +141,7 @@
                   </tbody>
 
                 </table>
-                
+
 
               </div>
 
