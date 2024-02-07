@@ -155,9 +155,7 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
       // dom: 'Bfrt',
       searching: false,
       dom: 'Bfrt',
-      // buttons: [
-      //   'copy', 'csv', 'excel', 'print'
-      // ],
+      buttons: [],
       columns: [
         { title: 'Device ID', data: 'device_id' },
         //{ title: 'TracNet Id', data: '_id' },
@@ -497,8 +495,7 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
       response.forEach((item: any) => {
         if (item.data_type == "2") {
           item.data_type = "Scheduled";
-        }
-        if (item.data_type != "2") {
+        } else if (item.data_type != "2") {
           item.data_type = "Alarm";
         }
       });
