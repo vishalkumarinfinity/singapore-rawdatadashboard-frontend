@@ -12,6 +12,7 @@ import moment from 'moment-timezone';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { IgxPaginatorComponent } from 'igniteui-angular';
 import { IgxGridComponent } from 'igniteui-angular';
+import * as XLSX from 'xlsx';
 
 
 declare var $: any;
@@ -505,8 +506,8 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
           this.downloadFile(csvString, 'filename.csv', 'text/csv');
         }
         if (fileType === 'Excel') {
-          const excelDataUri = this.convertArrayOfObjectsToExcelDataUri(response);
-          this.downloadFile(excelDataUri, 'filename.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+          const excelData = this.convertArrayOfObjectsToExcel(response);
+          this.downloadFile(excelData, 'filename.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         }
 
       },
@@ -515,16 +516,7 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
       }
     );
   }
-  convertArrayOfObjectsToExcelDataUri(data: any[]): string {
-    const table = '<table>';
-    const header = `<tr>${Object.keys(data[0]).map(key => `<th>${key}</th>`).join('')}</tr>`;
-    const rows = data.map(obj => `<tr>${Object.values(obj).map(value => `<td>${value}</td>`).join('')}</tr>`).join('');
-    const html = `${table}${header}${rows}</table>`;
 
-    // Create a data URI
-    const dataUri = `data:application/vnd.ms-excel;base64,${btoa(html)}`;
-    return dataUri;
-  }
 
   convertArrayOfObjectsToCSV(data: any[]): string {
     const header = Object.keys(data[0]).join(',') + '\n';
@@ -535,9 +527,30 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
 
     return header + rows;
   }
+  convertArrayOfObjectsToExcel(data: any[]): Blob {
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
-  downloadFile(data: any, filename: string, type: string) {
-    const blob = new Blob([data], { type: type });
+    // Create binary data
+    const excelDataBinary = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+    // Convert binary to Blob
+    const blob = new Blob([this.s2ab(excelDataBinary)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+    return blob;
+  }
+  s2ab(s: string): ArrayBuffer {
+    const buf = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buf);
+    for (let i = 0; i !== s.length; ++i) {
+      view[i] = s.charCodeAt(i) & 0xFF;
+    }
+    return buf;
+  }
+
+  downloadFile(data: any, filename: string, fileType: string) {
+    const blob = new Blob([data], { type: fileType });
     const url = window.URL.createObjectURL(blob);
 
     // Create a link element and click it to trigger the download

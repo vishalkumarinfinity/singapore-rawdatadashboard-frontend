@@ -42,6 +42,7 @@
     "rxjs": "~7.5.0",
     "select2": "^4.1.0-rc.0",
     "tslib": "^2.3.0",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.13.1"
   },
   "devDependencies": {
