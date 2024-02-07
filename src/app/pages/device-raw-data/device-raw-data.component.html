@@ -113,14 +113,6 @@
                   <input type="text" id="searchInput" name="searchInput" placeholder="searching..."
                     [(ngModel)]="searchValue" (ngModelChange)="searchingCall()" (keydown)="searchingCall()">
                 </div>
-
-                <div>
-                  <button (click)="exportCsv('Copy')">Copy</button>
-                  <button (click)="exportCsv('CSV')">Export CSV</button>
-                  <button (click)="exportCsv('Excel')">Export Excel</button>
-                  <button (click)="exportCsv('Print')">Print</button>
-                </div>
-
               </div>
 
 
@@ -130,6 +122,12 @@
               </ngb-pagination>
               <!-- </ng-container> -->
               <div class="card-body">
+                <div class="dt-buttons">
+                  <button (click)="exports('Copy')">Copy</button>
+                  <button (click)="exports('CSV')">CSV</button>
+                  <button (click)="exports('Excel')">Excel</button>
+                  <button (click)="exports('Print')">Print</button>
+                </div>
                 <table id="example" class="table table-bordered table-striped headerSticky" datatable
                   [dtOptions]="dtOptions">
                   <!-- <table id="example" datatable [dtOptions]="dtOptions" class="row-border hover"> -->

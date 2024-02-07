@@ -489,24 +489,42 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
   //    this._api.getExport('raw-data/export-csv').subscribe(response => console.log(response));
   // }
 
-  exportCsv(fileType: any) {
-    this._api.getExport('raw-data/export-csv', this.currentPage, this.limit, this.startDateFil, this.endDateFil, this.deviceIdData, this.searchValue,).subscribe((response: any) => {
+  exports(fileType: any) {
+    this._api.getExport('raw-data/export-csv', this.currentPage, this.limit, this.startDateFil, this.endDateFil, this.deviceIdData, this.searchValue,).subscribe((responses: any) => {
 
-      response.forEach((item: any) => {
+      const response = responses.map((item: any) => {
         if (item.data_type == "2") {
           item.data_type = "Scheduled";
-        } else if (item.data_type != "2") {
+        } else {
           item.data_type = "Alarm";
         }
+
+        return {
+          device_id: item.device_id,
+          data_type: item.data_type,
+          date: item.date,
+          height: item.height,
+          angle: item.angle,
+          signal_strength: item.signal_strength,
+          battery_voltage: item.battery_voltage,
+          temperature: item.temperature,
+          status: item.status,
+          moved_alarm: item.moved_alarm,
+          battery_status: item.battery_status,
+          serverip: item.serverip,
+          remoteip: item.remoteip,
+          uploads_since_power_on: item.uploads_since_power_on
+        };
+
       });
 
       if (fileType === 'CSV') {
         const csvString = this.convertArrayOfObjectsToCSV(response);
-        this.downloadFile(csvString, 'filename.csv', 'text/csv');
+        this.downloadFile(csvString, 'point_history.csv', 'text/csv');
       }
       if (fileType === 'Excel') {
         const excelData = this.convertArrayOfObjectsToExcel(response);
-        this.downloadFile(excelData, 'filename.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        this.downloadFile(excelData, 'point_history.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       }
       if (fileType === 'Print') {
         this.printData(response);
@@ -521,16 +539,20 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
       }
     );
   }
+
   copyData(data: any[]) {
-    const copyContent = this.formatDataForPrint(data);
+    const copyContent = data.map(item => {
+      return `Point History\nDevice ID\tUpload Type\tTimestamp\tDistance (mm)\tAngle (deg)\tSignal Strength (dBm)\tBattery Voltage (V)\tTemperature\tDistance Alarm\tAngle Alarm\tBattery Status\tServer IP\tRemote IP\tUploads Since Power On\n${item.device_id}\t${item.data_type}\t${item.date}\t${item.height}\t${item.angle}\t${item.signal_strength}\t${item.battery_voltage}\t${item.temperature}\t${item.status}\t${item.moved_alarm}\t${item.battery_status}\t${item.serverip}\t${item.remoteip}\t${item.uploads_since_power_on}\n`;
+    }).join('');
+    
     const textarea = document.createElement('textarea');
     textarea.value = copyContent;
     document.body.appendChild(textarea);
     textarea.select();
     document.execCommand('copy');
     document.body.removeChild(textarea);
-
   }
+ 
   printData(data: any[]) {
     // You can customize this function based on how you want to format and print your data
     const printContent = this.formatDataForPrint(data);
@@ -550,21 +572,21 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
   formatDataForPrint(data: any[]): string {
     const tableRows = data.map(item => {
       return `
-        <tr>
-          <td>${item.serverip}</td>
-          <td>${item.remoteip}</td>
-          <td>${item.date}</td>
+      <tr>
           <td>${item.device_id}</td>
+          <td>${item.data_type}</td>
+          <td>${item.date}</td>
           <td>${item.height}</td>
-          <td>${item.temperature}</td>
           <td>${item.angle}</td>
+          <td>${item.signal_strength}</td>
+          <td>${item.battery_voltage}</td>
+          <td>${item.temperature}</td>
           <td>${item.status}</td>
           <td>${item.moved_alarm}</td>
           <td>${item.battery_status}</td>
-          <td>${item.battery_voltage}</td>
-          <td>${item.signal_strength}</td>
+          <td>${item.serverip}</td>
+          <td>${item.remoteip}</td>
           <td>${item.uploads_since_power_on}</td>
-          <td>${item.data_type}</td>
         </tr>
       `;
     });
@@ -597,20 +619,20 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
           <table>
             <thead>
               <tr>
+              <th>Device ID</th>
+              <th>Data Type</th>
+              <th>Date</th>
+              <th>Height</th>
+              <th>Angle</th>
+              <th>Signal Strength</th>
+              <th>Battery Voltage</th>
+              <th>Temperature</th>
+              <th>Status</th>
+              <th>Moved Alarm</th>
+              <th>Battery Status</th>
                 <th>Server IP</th>
                 <th>Remote IP</th>
-                <th>Date</th>
-                <th>Device ID</th>
-                <th>Height</th>
-                <th>Temperature</th>
-                <th>Angle</th>
-                <th>Status</th>
-                <th>Moved Alarm</th>
-                <th>Battery Status</th>
-                <th>Battery Voltage</th>
-                <th>Signal Strength</th>
                 <th>Uploads Since Power On</th>
-                <th>Data Type</th>
               </tr>
             </thead>
             <tbody>
