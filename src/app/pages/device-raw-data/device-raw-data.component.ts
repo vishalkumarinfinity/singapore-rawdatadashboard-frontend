@@ -502,7 +502,7 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
           angle: item.angle,
           signal_strength: Number((parseFloat(item.signal_strength)).toFixed()),
           battery_voltage: parseFloat(item.battery_voltage).toFixed(2),
-          temperature: item.temperature + '.0°',
+          temperature: parseFloat(item.temperature).toFixed(1) + '°',
           status: item.status,
           moved_alarm: item.moved_alarm,
           battery_status: item.battery_status,
