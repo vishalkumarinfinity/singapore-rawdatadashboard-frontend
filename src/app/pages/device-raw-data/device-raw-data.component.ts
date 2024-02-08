@@ -52,7 +52,8 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
 
   startDateFil: any;
   endDateFil: any;
-
+  expStartDate: any;
+  expEndDate: any
   startDate: any;
   endDate: any;
   alwaysShowCalendars!: boolean;
@@ -289,24 +290,6 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
   }
 
 
-
-
-
-
-
-  // ngAfterViewInit() {
-
-  //   this.updateSubscription = interval(100000).subscribe(
-  //     (val) => { 
-  //       setTimeout(() => {
-  //         this.filterTableDataByDate();
-  //         this.LoadRawData(); 
-  //       });
-
-  //     }
-  //   );
-
-  // }
   showLoader() {
     this.ngxLoader.start(); // Show the loader
   }
@@ -326,14 +309,12 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
   }
 
 
-
-
-
-
   LoadRawData() {
     this.showLoader();
     this.selected.startDate = moment().subtract(1, 'days').startOf('day');
     this.selected.startDate = moment().endOf('day');
+    this.expStartDate = this.startDate;
+    this.expEndDate = this.endDate;
     this._api.getRawData('raw-data', this.currentPage, this.limit, this.startDate, this.endDate, this.deviceIdData, this.searchValue).subscribe((res: any) => {
       this.tableData = res.data.data;
 
@@ -444,45 +425,37 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
       this.currentPage = 1;
     }
 
+    this.expStartDate = this.startDateFil;
+    this.expEndDate = this.endDateFil;
 
     this.showLoader();
-    this._api
-      .getRawData(
-        'raw-data',
-        this.currentPage,
-        this.limit,
-        this.startDateFil,
-        this.endDateFil,
-        this.deviceIdData,
-        this.searchValue,
-      )
-      .subscribe((res: any) => {
-        this.tableData = res.data.data;
-        this.numOfResult = res.data.total;
-        this.resultPerPage = res.data.resultPerPage;
-        this.filteredData = this.tableData;
-        this.totalPage = Math.ceil(this.numOfResult / this.limit);
+    this._api.getRawData('raw-data', this.currentPage, this.limit, this.startDateFil, this.endDateFil, this.deviceIdData, this.searchValue,).subscribe((res: any) => {
+      this.tableData = res.data.data;
+      this.numOfResult = res.data.total;
+      this.resultPerPage = res.data.resultPerPage;
+      this.filteredData = this.tableData;
+      this.totalPage = Math.ceil(this.numOfResult / this.limit);
 
-        if (this.datatableElement) {
-          this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
-            dtInstance.clear();
-            dtInstance.rows.add(this.filteredData);
-            dtInstance.draw();
-          });
-        }
+      if (this.datatableElement) {
+        this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
+          dtInstance.clear();
+          dtInstance.rows.add(this.filteredData);
+          dtInstance.draw();
+        });
+      }
 
-        // Check if the total number of results exceeds the threshold
-        if (this.numOfResult > this.threshold) {
-          // Collapse the pagination component
-          this.showPagination = false;
-        } else {
-          // Show the pagination component
-          this.showPagination = true;
-        }
+      // Check if the total number of results exceeds the threshold
+      if (this.numOfResult > this.threshold) {
+        // Collapse the pagination component
+        this.showPagination = false;
+      } else {
+        // Show the pagination component
+        this.showPagination = true;
+      }
 
-        // Hide the loader
-        this.hideLoader();
-      });
+      // Hide the loader
+      this.hideLoader();
+    });
   }
 
   // exportCsv() {
@@ -490,7 +463,7 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
   // }
 
   exports(fileType: any) {
-    this._api.getExport('raw-data/export-csv', this.currentPage, this.limit, this.startDateFil, this.endDateFil, this.deviceIdData, this.searchValue,).subscribe((responses: any) => {
+    this._api.getExport('raw-data/export-csv', this.currentPage, this.limit, this.expStartDate, this.expEndDate, this.deviceIdData, this.searchValue,).subscribe((responses: any) => {
 
       const response = responses.map((item: any) => {
 
