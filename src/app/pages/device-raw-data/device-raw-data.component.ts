@@ -493,27 +493,22 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
     this._api.getExport('raw-data/export-csv', this.currentPage, this.limit, this.startDateFil, this.endDateFil, this.deviceIdData, this.searchValue,).subscribe((responses: any) => {
 
       const response = responses.map((item: any) => {
-        if (item.data_type == "2") {
-          item.data_type = "Scheduled";
-        } else {
-          item.data_type = "Alarm";
-        }
 
         return {
           device_id: item.device_id,
-          data_type: item.data_type,
-          date: item.date,
-          height: item.height,
+          data_type: this.convertUploadType(item.data_type),
+          date: this.convertDateFormat(item.date),
+          height: item.height.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','),
           angle: item.angle,
-          signal_strength: item.signal_strength,
-          battery_voltage: item.battery_voltage,
-          temperature: item.temperature,
+          signal_strength: Number((parseFloat(item.signal_strength)).toFixed()),
+          battery_voltage: parseFloat(item.battery_voltage).toFixed(2),
+          temperature: item.temperature + '.0°',
           status: item.status,
           moved_alarm: item.moved_alarm,
           battery_status: item.battery_status,
           serverip: item.serverip,
           remoteip: item.remoteip,
-          uploads_since_power_on: item.uploads_since_power_on
+          uploads_since_power_on: Number((parseFloat(item.uploads_since_power_on)).toFixed()).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','),
         };
 
       });
@@ -523,7 +518,8 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
         this.downloadFile(csvString, 'point_history.csv', 'text/csv');
       }
       if (fileType === 'Excel') {
-        const excelData = this.convertArrayOfObjectsToExcel(response);
+        const manualHeaders = ['Device ID', 'Upload Type', 'Timestamp', 'Distance (mm)', 'Angle (deg)', 'Signal Strength (dBm)', 'Battery Voltage (V) ', 'Temperature ', 'Distance Alarm', 'Angle Alarm', 'Battery Status', 'Server IP', 'Remote IP', 'Uploads Since Power On'];
+        const excelData = this.convertArrayOfObjectsToExcel(response, manualHeaders);
         this.downloadFile(excelData, 'point_history.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       }
       if (fileType === 'Print') {
@@ -541,10 +537,11 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
   }
 
   copyData(data: any[]) {
-    const copyContent = data.map(item => {
-      return `Point History\nDevice ID\tUpload Type\tTimestamp\tDistance (mm)\tAngle (deg)\tSignal Strength (dBm)\tBattery Voltage (V)\tTemperature\tDistance Alarm\tAngle Alarm\tBattery Status\tServer IP\tRemote IP\tUploads Since Power On\n${item.device_id}\t${item.data_type}\t${item.date}\t${item.height}\t${item.angle}\t${item.signal_strength}\t${item.battery_voltage}\t${item.temperature}\t${item.status}\t${item.moved_alarm}\t${item.battery_status}\t${item.serverip}\t${item.remoteip}\t${item.uploads_since_power_on}\n`;
+    var copyContent = `Point History\nDevice ID\tUpload Type\tTimestamp\tDistance (mm)\tAngle (deg)\tSignal Strength (dBm)\tBattery Voltage (V)\tTemperature\tDistance Alarm\tAngle Alarm\tBattery Status\tServer IP\tRemote IP\tUploads Since Power On\n`
+    copyContent += data.map(item => {
+      return `${item.device_id}\t${item.data_type}\t${item.date}\t${item.height}\t${item.angle}\t${item.signal_strength}\t${item.battery_voltage}\t${item.temperature}\t${item.status}\t${item.moved_alarm}\t${item.battery_status}\t${item.serverip}\t${item.remoteip}\t${item.uploads_since_power_on}\n`;
     }).join('');
-    
+
     const textarea = document.createElement('textarea');
     textarea.value = copyContent;
     document.body.appendChild(textarea);
@@ -552,7 +549,7 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
     document.execCommand('copy');
     document.body.removeChild(textarea);
   }
- 
+
   printData(data: any[]) {
     // You can customize this function based on how you want to format and print your data
     const printContent = this.formatDataForPrint(data);
@@ -619,17 +616,17 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
           <table>
             <thead>
               <tr>
-              <th>Device ID</th>
-              <th>Data Type</th>
-              <th>Date</th>
-              <th>Height</th>
-              <th>Angle</th>
-              <th>Signal Strength</th>
-              <th>Battery Voltage</th>
-              <th>Temperature</th>
-              <th>Status</th>
-              <th>Moved Alarm</th>
-              <th>Battery Status</th>
+                <th>Device ID</th>
+                <th>Upload Type</th>
+                <th>Timestamp</th>
+                <th>Distance (mm)</th>
+                <th>Angle (deg)</th>
+                <th>Signal Strength (dBm)</th>
+                <th>Battery Voltage (V)</th>
+                <th>Temperature</th>
+                <th>Distance Alarm</th>
+                <th>Angle Alarm</th>
+                <th>Battery Status</th>
                 <th>Server IP</th>
                 <th>Remote IP</th>
                 <th>Uploads Since Power On</th>
@@ -647,7 +644,8 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
 
 
   convertArrayOfObjectsToCSV(data: any[]): string {
-    const header = Object.keys(data[0]).join(',') + '\n';
+    const customHeaders = ['Device ID', 'Upload Type', 'Timestamp', 'Distance (mm)', 'Angle (deg)', 'Signal Strength (dBm)', 'Battery Voltage (V) ', 'Temperature ', 'Distance Alarm', 'Angle Alarm', 'Battery Status', 'Server IP', 'Remote IP', 'Uploads Since Power On'];
+    const header = customHeaders.join(',') + '\n';
 
     const rows = data.map(obj =>
       Object.values(obj).map(value => JSON.stringify(value)).join(',')
@@ -655,19 +653,15 @@ export class DeviceRawDataComponent implements OnInit, AfterViewInit {
 
     return header + rows;
   }
-  convertArrayOfObjectsToExcel(data: any[]): Blob {
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(data);
+  convertArrayOfObjectsToExcel(data: any[], manualHeaders: string[]): Blob {
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet([manualHeaders, ...data.map(obj => Object.values(obj))]);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-
-    // Create binary data
     const excelDataBinary = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-
-    // Convert binary to Blob
     const blob = new Blob([this.s2ab(excelDataBinary)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
     return blob;
   }
+
   s2ab(s: string): ArrayBuffer {
     const buf = new ArrayBuffer(s.length);
     const view = new Uint8Array(buf);
